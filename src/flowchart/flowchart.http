@@ -1,0 +1,48 @@
+### Create a new flowchart
+POST http://localhost:3001/flowcharts
+Content-Type: application/json
+
+{
+  "name": "New Flowchart",
+  "description": "This is a new flowchart",
+  "projectId": "1",
+  "definitionASL": {
+    "StartAt": "InitialState",
+    "States": {
+      "InitialState": {
+        "Type": "Pass",
+        "End": true
+      }
+    }
+  }
+}
+
+### Deploy a flowchart
+POST http://localhost:3001/flowcharts/1/deploy
+
+### Execute a flowchart
+POST http://localhost:3001/flowcharts/1/execute
+
+
+
+
+
+
+### Get all flowcharts
+GET http://localhost:3001/flowcharts
+
+### Get a flowchart by ID
+GET http://localhost:3001/flowcharts/1
+
+### Update a flowchart
+PATCH http://localhost:3001/flowcharts/1
+Content-Type: application/json
+
+{
+  "name": "Updated Flowchart Name",
+  "description": "Updated description of the flowchart"
+}
+
+### Delete a flowchart
+DELETE http://localhost:3001/flowcharts/1
+
