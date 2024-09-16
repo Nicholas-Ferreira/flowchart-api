@@ -1,4 +1,4 @@
-import { IsJSON, IsNotEmpty, IsNumberString, IsString } from 'class-validator';
+import { IsJSON, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateFlowchartDto {
   @IsNotEmpty()
@@ -10,8 +10,8 @@ export class CreateFlowchartDto {
   description: string;
 
   @IsNotEmpty()
-  @IsNumberString()
-  projectId: number;
+  @IsString()
+  projectId: string;
 
   @IsNotEmpty()
   @IsJSON()

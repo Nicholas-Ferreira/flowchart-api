@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Flowchart } from 'src/shared/entities/flowchart.entity';
 import { Project } from 'src/shared/entities/project.entity';
 import { State } from 'src/shared/entities/state.entity';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { CreateFlowchartDto } from './dto/create-flowchart.dto';
 import { UpdateFlowchartDto } from './dto/update-flowchart.dto';
 import { DeployLambdaService } from './use-cases/deploy-lambda.service';
@@ -35,8 +35,18 @@ export class FlowchartService {
     return this.flowchartRepository.save(flowchart);
   }
 
-  async findAll(): Promise<Flowchart[]> {
-    return this.flowchartRepository.find({ relations: ['project', 'states'] });
+  async findAll(projectId?: string): Promise<Flowchart[]> {
+    const findOptions: FindOneOptions<Flowchart> = { where: {} };
+
+    if (projectId) {
+      const project = await this.projectRepository.findOneBy({ id: projectId });
+      if (!project) throw new NotFoundException('Project not found');
+      findOptions.where = Object.assign(findOptions.where, { project: { id: project.id } });
+    }
+
+    findOptions.relations = ['project', 'states'];
+    console.log({ findOptions });
+    return this.flowchartRepository.find(findOptions);
   }
 
   async findOne(id: number): Promise<Flowchart> {

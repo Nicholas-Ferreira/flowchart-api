@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { lambdaClient } from '../../config/aws.config';
-import { Flowchart } from '../../shared/entities/flowchart.entity';
+import { lambdaClient } from '../../../config/aws.config';
+import { Flowchart } from '../../../shared/entities/flowchart.entity';
 
 @Injectable()
 export class DeployLambdaService {

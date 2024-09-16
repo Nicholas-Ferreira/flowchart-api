@@ -1,20 +1,44 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Project } from './project.entity';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Sensitive } from '../decorators/sensitive.decorator';
+import { Organization } from './organization.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Sensitive()
+  @Column({ unique: true, nullable: true })
+  idpId: string;
+
   @Column({ length: 100 })
   name: string;
 
+  @Sensitive()
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
+  @CreateDateColumn()
+  createdAt: Date;
 
-  @OneToMany(() => Project, (project) => project.user)
-  projects: Project[];
+  @UpdateDateColumn()
+  updateAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @OneToMany(() => Organization, (organization) => organization.ownerUser)
+  ownerOrganizations: Organization[];
+
+  @ManyToMany(() => Organization, (organization) => organization.members)
+  organizations: Organization[];
 }

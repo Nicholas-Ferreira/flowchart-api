@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { stepFunctionsClient } from 'src/config/aws.config';
-import { Flowchart } from '../../shared/entities/flowchart.entity';
+import { Flowchart } from '../../../shared/entities/flowchart.entity';
 
 @Injectable()
 export class DeployStepFunctionService {

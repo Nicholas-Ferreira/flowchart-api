@@ -1,12 +1,21 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Flowchart } from './flowchart.entity';
 import { LambdaFunction } from './lambda-function.entity';
-import { User } from './user.entity';
+import { Organization } from './organization.entity';
 
 @Entity()
 export class Project {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 100 })
   name: string;
@@ -14,8 +23,20 @@ export class Project {
   @Column('text')
   description: string;
 
-  @ManyToOne(() => User, (user) => user.projects)
-  user: User;
+  @Column()
+  createdBy: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updateAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @ManyToOne(() => Organization, (organization) => organization.projects)
+  organization: Organization;
 
   @OneToMany(() => Flowchart, (flowchart) => flowchart.project)
   flowcharts: Flowchart[];

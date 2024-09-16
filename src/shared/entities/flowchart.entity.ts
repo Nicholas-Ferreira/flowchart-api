@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ExecutionHistory } from './execution-history.entity';
-import { Project } from './project.entity';
+import { Organization } from './organization.entity';
 import { State } from './state.entity';
 
 @Entity()
@@ -20,8 +20,8 @@ export class Flowchart {
   @Column({ nullable: true })
   stepFunctionArn?: string;
 
-  @ManyToOne(() => Project, (project) => project.flowcharts)
-  project: Project;
+  @ManyToOne(() => Organization, (organization) => organization.projects)
+  organization: Organization;
 
   @OneToMany(() => State, (state) => state.flowchart)
   states: State[];

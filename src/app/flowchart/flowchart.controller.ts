@@ -1,9 +1,22 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { CreateFlowchartDto } from './dto/create-flowchart.dto';
 import { UpdateFlowchartDto } from './dto/update-flowchart.dto';
 import { FlowchartService } from './flowchart.service';
 
-@Controller('flowcharts')
+@UseGuards(AuthGuard())
+@Controller('flowchart')
 export class FlowchartController {
   constructor(private readonly flowchartService: FlowchartService) {}
 
@@ -13,8 +26,8 @@ export class FlowchartController {
   }
 
   @Get()
-  findAll() {
-    return this.flowchartService.findAll();
+  findAll(@Query('projectId') projectId?: string) {
+    return this.flowchartService.findAll(projectId);
   }
 
   @Get(':id')
