@@ -11,7 +11,7 @@ export class CreateFlowchartDto {
 
   @IsNotEmpty()
   @IsString()
-  projectId: string;
+  organizationId: string;
 
   @IsNotEmpty()
   @IsJSON()

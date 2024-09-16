@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Flowchart } from 'src/shared/entities/flowchart.entity';
-import { Project } from 'src/shared/entities/project.entity';
+import { Organization } from 'src/shared/entities/organization.entity';
 import { State } from 'src/shared/entities/state.entity';
 import { FlowchartController } from './flowchart.controller';
 import { FlowchartService } from './flowchart.service';
@@ -10,7 +10,7 @@ import { DeployStepFunctionService } from './use-cases/deploy-step-function.serv
 import { ExecuteFlowchartService } from './use-cases/execute-flowchart.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Flowchart, Project, State])],
+  imports: [TypeOrmModule.forFeature([Flowchart, Organization, State])],
   controllers: [FlowchartController],
   providers: [
     FlowchartService,

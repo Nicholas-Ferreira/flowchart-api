@@ -8,7 +8,6 @@ import { AuthModule } from './app/auth/auth.module';
 import { GuardAuthModule } from './app/auth/guards/guard-auth.module';
 import { FlowchartModule } from './app/flowchart/flowchart.module';
 import { OrganizationModule } from './app/organization/organization.module';
-import { ProjectModule } from './app/project/project.module';
 
 @Module({
   imports: [
@@ -28,7 +27,6 @@ import { ProjectModule } from './app/project/project.module';
       synchronize: true,
     }),
     GuardAuthModule,
-    ProjectModule,
     FlowchartModule,
     OrganizationModule,
     AuthModule,

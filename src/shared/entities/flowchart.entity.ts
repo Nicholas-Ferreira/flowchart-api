@@ -20,7 +20,7 @@ export class Flowchart {
   @Column({ nullable: true })
   stepFunctionArn?: string;
 
-  @ManyToOne(() => Organization, (organization) => organization.projects)
+  @ManyToOne(() => Organization, (organization) => organization.flowcharts)
   organization: Organization;
 
   @OneToMany(() => State, (state) => state.flowchart)

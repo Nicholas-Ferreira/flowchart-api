@@ -1,5 +1,4 @@
-import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Project } from './project.entity';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { State } from './state.entity';
 
 @Entity()
@@ -12,9 +11,6 @@ export class LambdaFunction {
 
   @Column('text')
   sourceCode: string;
-
-  @ManyToOne(() => Project, (project) => project.lambdas)
-  project: Project;
 
   @OneToOne(() => State, (state) => state.lambda)
   state: State;

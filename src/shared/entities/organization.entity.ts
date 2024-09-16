@@ -34,7 +34,7 @@ export class Organization {
   ownerUser: User;
 
   @OneToMany(() => Flowchart, (flowchart) => flowchart.organization)
-  flowchart: Flowchart[];
+  flowcharts: Flowchart[];
 
   @ManyToMany(() => User, (user) => user.organizations)
   @JoinTable({
