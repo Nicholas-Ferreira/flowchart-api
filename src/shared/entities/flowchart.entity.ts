@@ -1,12 +1,20 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { ExecutionHistory } from './execution-history.entity';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Organization } from './organization.entity';
 import { State } from './state.entity';
 
 @Entity()
 export class Flowchart {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 100 })
   name: string;
@@ -20,12 +28,21 @@ export class Flowchart {
   @Column({ nullable: true })
   stepFunctionArn?: string;
 
+  @Column()
+  createdBy: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updateAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
   @ManyToOne(() => Organization, (organization) => organization.flowcharts)
   organization: Organization;
 
   @OneToMany(() => State, (state) => state.flowchart)
   states: State[];
-
-  @OneToMany(() => ExecutionHistory, (executionHistory) => executionHistory.flowchart)
-  executionHistories: ExecutionHistory[];
 }

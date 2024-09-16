@@ -12,8 +12,8 @@ import { Organization } from '../entities/organization.entity';
 import { User } from '../entities/user.entity';
 
 @Injectable()
-export class IsMemberGuard implements CanActivate {
-  private logger: Logger = new Logger(IsMemberGuard.name);
+export class IsMemberOfOrganizationGuard implements CanActivate {
+  private logger: Logger = new Logger(IsMemberOfOrganizationGuard.name);
 
   constructor(
     @InjectRepository(Organization)

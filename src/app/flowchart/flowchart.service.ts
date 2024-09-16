@@ -2,8 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Flowchart } from 'src/shared/entities/flowchart.entity';
 import { Organization } from 'src/shared/entities/organization.entity';
-import { State } from 'src/shared/entities/state.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { User } from 'src/shared/entities/user.entity';
+import { Repository } from 'typeorm';
+import { DEFAULT_DEFINITION_ASL } from './constants/flowchart.constants';
 import { CreateFlowchartDto } from './dto/create-flowchart.dto';
 import { UpdateFlowchartDto } from './dto/update-flowchart.dto';
 import { DeployLambdaService } from './use-cases/deploy-lambda.service';
@@ -15,8 +16,6 @@ export class FlowchartService {
   constructor(
     @InjectRepository(Flowchart)
     private readonly flowchartRepository: Repository<Flowchart>,
-    @InjectRepository(State)
-    private readonly stateRepository: Repository<State>,
     @InjectRepository(Organization)
     private readonly organizationRepository: Repository<Organization>,
     private readonly deployLambdaService: DeployLambdaService,
@@ -24,52 +23,50 @@ export class FlowchartService {
     private readonly executeFlowchartService: ExecuteFlowchartService,
   ) {}
 
-  async create(createFlowchartDto: CreateFlowchartDto): Promise<Flowchart> {
-    const organization = await this.organizationRepository.findOneBy({
-      id: createFlowchartDto.organizationId,
-    });
-    if (!organization) throw new NotFoundException('Organization not found');
-
+  async create(
+    user: User,
+    organizationId: string,
+    createFlowchartDto: CreateFlowchartDto,
+  ): Promise<Flowchart> {
     const flowchart = this.flowchartRepository.create({
       ...createFlowchartDto,
-      organization,
+      definitionASL: DEFAULT_DEFINITION_ASL,
+      createdBy: user.id,
+      organization: <Partial<Organization>>{ id: organizationId },
     });
+
     return this.flowchartRepository.save(flowchart);
   }
 
-  async findAll(organizationId?: string): Promise<Flowchart[]> {
-    const findOptions: FindOneOptions<Flowchart> = { where: {} };
-
-    if (organizationId) {
-      const organization = await this.organizationRepository.findOneBy({ id: organizationId });
-      if (!organization) throw new NotFoundException('Organization not found');
-      findOptions.where = Object.assign(findOptions.where, {
-        organization: { id: organization.id },
-      });
-    }
-
-    findOptions.relations = ['organization', 'states'];
-    console.log({ findOptions });
-    return this.flowchartRepository.find(findOptions);
-  }
-
-  async findOne(id: number): Promise<Flowchart> {
-    return this.flowchartRepository.findOne({
-      where: { id },
+  async findAll(organizationId: string): Promise<Flowchart[]> {
+    return this.flowchartRepository.find({
+      where: { organization: { id: organizationId } },
       relations: ['organization', 'states'],
     });
   }
 
-  async update(id: number, updateFlowchartDto: UpdateFlowchartDto): Promise<Flowchart> {
-    await this.flowchartRepository.update(id, updateFlowchartDto);
-    return this.findOne(id);
+  async findOne(flowchartId: string): Promise<Flowchart> {
+    const flowchart = await this.flowchartRepository.findOne({
+      where: { id: flowchartId },
+      relations: ['organization', 'states'],
+    });
+    if (!flowchart) throw new NotFoundException('Flowchart not found');
+    return flowchart;
   }
 
-  async remove(id: number): Promise<void> {
-    await this.flowchartRepository.delete(id);
+  async update(flowchartId: string, updateFlowchartDto: UpdateFlowchartDto): Promise<Flowchart> {
+    const flowchart = await this.findOne(flowchartId);
+    Object.assign(flowchart, updateFlowchartDto);
+
+    return this.flowchartRepository.save(flowchart);
   }
 
-  async deploy(flowchartId: number): Promise<any> {
+  async remove(user: User, flowchartId: string): Promise<void> {
+    const flowchart = await this.findOne(flowchartId);
+    await this.flowchartRepository.remove(flowchart);
+  }
+
+  async deploy(flowchartId: string): Promise<any> {
     const flowchart = await this.findOne(flowchartId);
     if (!flowchart) throw new NotFoundException('Flowchart not found');
 
@@ -82,9 +79,8 @@ export class FlowchartService {
     return flowchart;
   }
 
-  async execute(flowchartId: number, input: any): Promise<any> {
+  async execute(flowchartId: string, input: any): Promise<any> {
     const flowchart = await this.findOne(flowchartId);
-    if (!flowchart) throw new NotFoundException('Flowchart not found');
     if (!flowchart.stepFunctionArn)
       throw new NotFoundException('Step Function not deployed for this flowchart');
 

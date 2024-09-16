@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/shared/entities/user.entity';
-import { IsMemberGuard } from 'src/shared/guards/is-member.guard';
+import { IsMemberOfOrganizationGuard } from 'src/shared/guards/is-member.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { AddUserDto } from './dto/add-user.dto';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { OrganizationService } from './organization.service';
 
-@UseGuards(AuthGuard(), IsMemberGuard)
+@UseGuards(AuthGuard(), IsMemberOfOrganizationGuard)
 @Controller('organization')
 export class OrganizationController {
   constructor(private readonly organizationService: OrganizationService) {}

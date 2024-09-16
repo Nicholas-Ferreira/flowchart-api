@@ -7,53 +7,63 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/shared/entities/user.entity';
+import { IsMemberOfOrganizationGuard } from 'src/shared/guards/is-member.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 import { CreateFlowchartDto } from './dto/create-flowchart.dto';
 import { UpdateFlowchartDto } from './dto/update-flowchart.dto';
 import { FlowchartService } from './flowchart.service';
 
-@UseGuards(AuthGuard())
-@Controller('flowchart')
+@UseGuards(AuthGuard(), IsMemberOfOrganizationGuard)
+@Controller('organization/:organizationId/flowchart')
 export class FlowchartController {
   constructor(private readonly flowchartService: FlowchartService) {}
 
   @Post()
-  create(@Body() createFlowchartDto: CreateFlowchartDto) {
-    return this.flowchartService.create(createFlowchartDto);
+  async create(
+    @Param('organizationId') organizationId: string,
+    @GetUser() user: User,
+    @Body() createFlowchartDto: CreateFlowchartDto,
+  ) {
+    return this.flowchartService.create(user, organizationId, createFlowchartDto);
   }
 
   @Get()
-  findAll(@Query('projectId') projectId?: string) {
-    return this.flowchartService.findAll(projectId);
+  async findAllFlowcharts(@Param('organizationId') organizationId: string) {
+    return this.flowchartService.findAll(organizationId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.flowchartService.findOne(id);
+  @Get(':flowchartId')
+  async findOne(@Param('flowchartId') flowchartId: string) {
+    return this.flowchartService.findOne(flowchartId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() updateFlowchartDto: UpdateFlowchartDto) {
-    return this.flowchartService.update(id, updateFlowchartDto);
+  @Patch(':flowchartId')
+  async update(
+    @Param('flowchartId') flowchartId: string,
+    @GetUser() user: User,
+    @Body() updateFlowchartDto: UpdateFlowchartDto,
+  ) {
+    return this.flowchartService.update(flowchartId, updateFlowchartDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.flowchartService.remove(id);
+  @Delete(':flowchartId')
+  async delete(@Param('flowchartId') flowchartId: string, @GetUser() user: User) {
+    return this.flowchartService.remove(user, flowchartId);
   }
 
-  @Post(':id/deploy')
+  @Post(':flowchartId/deploy')
   @HttpCode(200)
-  deploy(@Param('id') id: number) {
-    return this.flowchartService.deploy(id);
+  deploy(@Param('flowchartId') flowchartId: string) {
+    return this.flowchartService.deploy(flowchartId);
   }
 
-  @Post(':id/execute')
+  @Post(':flowchartId/execute')
   @HttpCode(200)
-  execute(@Param('id') id: number, @Body() input: any) {
-    return this.flowchartService.execute(id, input);
+  execute(@Param('flowchartId') flowchartId: string, @Body() input: any) {
+    return this.flowchartService.execute(flowchartId, input);
   }
 }
