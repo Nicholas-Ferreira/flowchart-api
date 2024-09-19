@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FlowchartVersion } from 'src/shared/entities/flowchart-version.entity';
 import { Flowchart } from 'src/shared/entities/flowchart.entity';
 import { Organization } from 'src/shared/entities/organization.entity';
 import { User } from 'src/shared/entities/user.entity';
@@ -16,6 +17,8 @@ export class FlowchartService {
   constructor(
     @InjectRepository(Flowchart)
     private readonly flowchartRepository: Repository<Flowchart>,
+    @InjectRepository(FlowchartVersion)
+    private readonly flowchartVersionRepository: Repository<FlowchartVersion>,
     @InjectRepository(Organization)
     private readonly organizationRepository: Repository<Organization>,
     private readonly deployLambdaService: DeployLambdaService,
@@ -30,7 +33,7 @@ export class FlowchartService {
   ): Promise<Flowchart> {
     const flowchart = this.flowchartRepository.create({
       ...createFlowchartDto,
-      definitionASL: DEFAULT_DEFINITION_ASL,
+      definition: DEFAULT_DEFINITION_ASL,
       createdBy: user.id,
       organization: <Partial<Organization>>{ id: organizationId },
     });
@@ -66,22 +69,22 @@ export class FlowchartService {
     await this.flowchartRepository.remove(flowchart);
   }
 
-  async deploy(flowchartId: string): Promise<any> {
-    const flowchart = await this.findOne(flowchartId);
-    if (!flowchart) throw new NotFoundException('Flowchart not found');
+  async deploy(flowchartVersionId: string): Promise<any> {
+    const version = await this.flowchartVersionRepository.findOneBy({ id: flowchartVersionId });
+    if (!version) throw new NotFoundException('Version not found');
 
-    await this.deployLambdaService.execute(flowchart);
+    await this.deployLambdaService.execute(version);
 
-    flowchart.stepFunctionArn = await this.deployStepFunctionService.execute(flowchart);
+    version.arn = await this.deployStepFunctionService.execute(version);
 
-    await this.flowchartRepository.save(flowchart);
+    await this.flowchartRepository.save(version);
 
-    return flowchart;
+    return version;
   }
 
-  async execute(flowchartId: string, input: any): Promise<any> {
-    const flowchart = await this.findOne(flowchartId);
-    if (!flowchart.stepFunctionArn)
+  async execute(flowchartVersionId: string, input: any): Promise<any> {
+    const flowchart = await this.flowchartVersionRepository.findOneBy({ id: flowchartVersionId });
+    if (!flowchart.arn)
       throw new NotFoundException('Step Function not deployed for this flowchart');
 
     return this.executeFlowchartService.execute(flowchart, input);

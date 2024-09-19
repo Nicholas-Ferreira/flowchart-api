@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { stepFunctionsClient } from 'src/config/aws.config';
-import { Flowchart } from '../../../shared/entities/flowchart.entity';
+import { FlowchartVersion } from 'src/shared/entities/flowchart-version.entity';
 
 @Injectable()
 export class DeployStepFunctionService {
-  async execute(flowchart: Flowchart): Promise<string> {
+  async execute(flowchart: FlowchartVersion): Promise<string> {
     const stepFunctionParams = {
       name: `StepFunction_${flowchart.id}_${Date.now()}`,
-      definition: JSON.stringify(flowchart.definitionASL),
+      definition: JSON.stringify(flowchart.definition),
       roleArn: 'arn:aws:iam::123456789012:role/service-role/StepFunctionsExecutionRole', // Substitua pelo ARN da role apropriada
     };
 

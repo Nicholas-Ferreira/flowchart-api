@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { FlowchartVersion } from 'src/shared/entities/flowchart-version.entity';
 import { lambdaClient } from '../../../config/aws.config';
-import { Flowchart } from '../../../shared/entities/flowchart.entity';
 
 @Injectable()
 export class DeployLambdaService {
-  async execute(flowchart: Flowchart): Promise<void> {
+  async execute(flowchart: FlowchartVersion): Promise<void> {
     for (const state of flowchart.states) {
       if (state.type === 'Task' && state.lambda) {
         const lambdaParams = {

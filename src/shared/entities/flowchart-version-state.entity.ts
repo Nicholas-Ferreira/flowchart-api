@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Flowchart } from './flowchart.entity';
+import { FlowchartVersion } from './flowchart-version.entity';
 import { LambdaFunction } from './lambda-function.entity';
 
-@Entity()
-export class State {
+@Entity('flowchart_version_state')
+export class FlowchartVersionState {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -16,8 +16,8 @@ export class State {
   @Column('json')
   definition: any;
 
-  @ManyToOne(() => Flowchart, (flowchart) => flowchart.states)
-  flowchart: Flowchart;
+  @ManyToOne(() => FlowchartVersion, (version) => version.states)
+  version: FlowchartVersion;
 
   @OneToOne(() => LambdaFunction, { nullable: true })
   @JoinColumn()

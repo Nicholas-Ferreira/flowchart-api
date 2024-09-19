@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { stepFunctionsClient } from 'src/config/aws.config';
-import { Flowchart } from 'src/shared/entities/flowchart.entity';
+import { FlowchartVersion } from 'src/shared/entities/flowchart-version.entity';
 
 @Injectable()
 export class ExecuteFlowchartService {
-  async execute(flowchart: Flowchart, input: any): Promise<any> {
+  async execute(flowchart: FlowchartVersion, input: any): Promise<any> {
     // Start the execution of the Step Function
     const executionParams = {
-      stateMachineArn: flowchart.stepFunctionArn,
+      stateMachineArn: flowchart.arn,
       input: JSON.stringify(input),
     };
 

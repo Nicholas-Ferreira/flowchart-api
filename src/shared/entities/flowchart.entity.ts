@@ -8,8 +8,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Environment } from './environment.entity';
+import { FlowchartVersion } from './flowchart-version.entity';
+import { LambdaFunction } from './lambda-function.entity';
 import { Organization } from './organization.entity';
-import { State } from './state.entity';
 
 @Entity()
 export class Flowchart {
@@ -23,10 +25,7 @@ export class Flowchart {
   description: string;
 
   @Column('json')
-  definitionASL: any;
-
-  @Column({ nullable: true })
-  stepFunctionArn?: string;
+  definition: any;
 
   @Column()
   createdBy: string;
@@ -43,6 +42,12 @@ export class Flowchart {
   @ManyToOne(() => Organization, (organization) => organization.flowcharts)
   organization: Organization;
 
-  @OneToMany(() => State, (state) => state.flowchart)
-  states: State[];
+  @ManyToOne(() => Environment, (environment) => environment.flowcharts)
+  environment: Environment;
+
+  @OneToMany(() => FlowchartVersion, (version) => version.flowchart)
+  versions: FlowchartVersion[];
+
+  @OneToMany(() => LambdaFunction, (lambda) => lambda.flowchart)
+  lambdas: FlowchartVersion[];
 }
