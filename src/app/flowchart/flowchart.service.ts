@@ -44,14 +44,14 @@ export class FlowchartService {
   async findAll(organizationId: string): Promise<Flowchart[]> {
     return this.flowchartRepository.find({
       where: { organization: { id: organizationId } },
-      relations: ['organization', 'states'],
+      relations: ['organization'],
     });
   }
 
   async findOne(flowchartId: string): Promise<Flowchart> {
     const flowchart = await this.flowchartRepository.findOne({
       where: { id: flowchartId },
-      relations: ['organization', 'states'],
+      relations: ['organization'],
     });
     if (!flowchart) throw new NotFoundException('Flowchart not found');
     return flowchart;
